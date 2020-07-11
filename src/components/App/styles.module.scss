@@ -10,17 +10,6 @@
   justify-content: center;
 }
 
-.defaultImages {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(100px, 1fr));
-  grid-template-rows: repeat(3, 150px);
-  justify-items: center;
-}
-
-.faceImage {
-  width: 60px;
-}
-
 .previewContainer {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,21 @@
+.imageList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(100px, 1fr));
+  grid-template-rows: repeat(3, 150px);
+  justify-items: center;
+}
+
+.image {
+  width: 60px;
+  transition: transform 200ms ease-in-out;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.2) rotate(15deg);
+  }
+}
+
+.selected {
+  border: 2px solid black;
+  transform: scale(1.2) rotate(15deg);
+}

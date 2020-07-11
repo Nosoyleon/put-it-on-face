@@ -1,23 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
+import ImageList from 'components/ImageList';
 
 import unselected from 'assets/images/default/user.png';
 import { DEFAULT_FACES, DEFAULT_MAKS } from './constants';
 import styles from './styles.module.scss';
 
 function App() {
+  const [faceUrl, setFaceUrl] = useState('');
+  const [maskUrl, setMaskUrl] = useState('');
+
   return (
     <div className={styles.mainWrapper}>
       <h1 className="title is-1 has-text-centered mb-6">Póntelos!</h1>
       <div className={styles.appContainer}>
-        <div className={styles.defaultImages}>
-          {DEFAULT_FACES.map(({ imageUrl, key }) => (
-            <img className={styles.faceImage} key={key} alt={key} src={imageUrl} />
-          ))}
-        </div>
+        <ImageList list={DEFAULT_FACES} selectImage={setFaceUrl} />
         <div className={styles.previewContainer}>
-          <img className={styles.previewImage} alt="face" src={unselected} />
+          <img
+            className={styles.previewImage}
+            alt="face"
+            src={faceUrl || unselected}
+          />
           <div className="file is-primary mt-5 is-large is-centered">
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className="file-label">
@@ -30,12 +34,9 @@ function App() {
               </span>
             </label>
           </div>
+          <span>{maskUrl}</span>
         </div>
-        <div className={styles.defaultImages}>
-          {DEFAULT_MAKS.map(({ imageUrl, key }) => (
-            <img className={styles.faceImage} key={key} alt={key} src={imageUrl} />
-          ))}
-        </div>
+        <ImageList list={DEFAULT_MAKS} selectImage={setMaskUrl} />
       </div>
     </div>
   );
