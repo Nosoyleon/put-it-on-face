@@ -8,20 +8,35 @@ import { DEFAULT_FACES, DEFAULT_MAKS } from './constants';
 import styles from './styles.module.scss';
 
 function App() {
-  const [faceUrl, setFaceUrl] = useState('');
-  const [maskUrl, setMaskUrl] = useState('');
+  const [selectedFace, setSelectedFace] = useState({});
+  const [selectedMask, setSelectedMask] = useState({});
 
   return (
     <div className={styles.mainWrapper}>
       <h1 className="title is-1 has-text-centered mb-6">Póntelos!</h1>
       <div className={styles.appContainer}>
-        <ImageList list={DEFAULT_FACES} selectImage={setFaceUrl} />
+        <ImageList
+          list={DEFAULT_FACES}
+          selectImage={face => setSelectedFace(face)}
+          selectedKey={selectedFace.key}
+        />
         <div className={styles.previewContainer}>
-          <img
-            className={styles.previewImage}
-            alt="face"
-            src={faceUrl || unselected}
-          />
+          <figure className={`image ${styles.imageWrapper}`}>
+            {selectedFace?.imageUrl && (
+              <button
+                type="button"
+                aria-label="delete"
+                className={`delete is-large ${styles.delete}`}
+                onClick={() => setSelectedFace({})}
+              />
+            )}
+            <img
+              className={styles.previewImage}
+              alt="face"
+              src={selectedFace.imageUrl || unselected}
+            />
+          </figure>
+
           <div className="file is-primary mt-5 is-large is-centered">
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className="file-label">
@@ -34,9 +49,14 @@ function App() {
               </span>
             </label>
           </div>
-          <span>{maskUrl}</span>
+          <span>{selectedMask.imageUrl}</span>
         </div>
-        <ImageList list={DEFAULT_MAKS} selectImage={setMaskUrl} />
+
+        <ImageList
+          list={DEFAULT_MAKS}
+          selectImage={mask => setSelectedMask(mask)}
+          selectedKey={selectedMask.key}
+        />
       </div>
     </div>
   );
