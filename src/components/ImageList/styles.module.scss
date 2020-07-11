@@ -1,8 +1,9 @@
 .imageList {
   display: grid;
   grid-template-columns: repeat(3, minmax(100px, 1fr));
-  grid-template-rows: repeat(3, 150px);
+  grid-template-rows: repeat(3, minmax(80px, 120px));
   justify-items: center;
+  padding: 10px;
 }
 
 .image {

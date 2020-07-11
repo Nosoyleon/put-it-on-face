@@ -35,36 +35,39 @@ export function loadModels() {
 export async function maskify(maskUrl, imageContainer, originalImage) {
   const scale = originalImage.width / originalImage.naturalWidth;
 
-  const handleImage = (_oldImage, newImage) => async () => {
-    const detection = await faceapi
-      .detectSingleFace(newImage, new faceapi.TinyFaceDetectorOptions())
-      .withFaceLandmarks(true);
+  return new Promise(resolve => {
+    const handleImage = newImage => async () => {
+      const detection = await faceapi
+        .detectSingleFace(newImage, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks(true);
 
-    if (!detection) {
-      console.log('No face detected');
-      return;
-    }
+      if (!detection) {
+        resolve('no-face');
+        return;
+      }
 
-    const overlayValues = getOverlayValues(detection.landmarks);
+      const overlayValues = getOverlayValues(detection.landmarks);
 
-    const overlay = document.createElement('img');
-    overlay.src = maskUrl;
-    overlay.id = 'mask-overlay';
-    overlay.alt = 'mask overlay.';
-    overlay.style.cssText = `
-        position: absolute;
-        left: ${overlayValues.leftOffset * scale}px;
-        top: ${overlayValues.topOffset * scale}px;
-        width: ${overlayValues.width * scale}px;
-        transform: rotate(${overlayValues.angle}deg);
-      `;
+      const overlay = document.createElement('img');
+      overlay.src = maskUrl;
+      overlay.id = 'mask-overlay';
+      overlay.alt = 'mask overlay.';
+      overlay.style.cssText = `
+          position: absolute;
+          left: ${overlayValues.leftOffset * scale}px;
+          top: ${overlayValues.topOffset * scale}px;
+          width: ${overlayValues.width * scale}px;
+          transform: rotate(${overlayValues.angle}deg);
+        `;
 
-    imageContainer.appendChild(overlay);
-  };
+      imageContainer.appendChild(overlay);
+      resolve('masked');
+    };
 
-  // To avoid CORS issues we create a cross-origin-friendly copy of the image.
-  const image = new Image();
-  image.crossOrigin = 'Anonymous';
-  image.addEventListener('load', handleImage(originalImage, image));
-  image.src = originalImage.src;
+    // To avoid CORS issues we create a cross-origin-friendly copy of the image.
+    const image = new Image();
+    image.crossOrigin = 'Anonymous';
+    image.addEventListener('load', handleImage(image));
+    image.src = originalImage.src;
+  });
 }

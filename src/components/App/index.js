@@ -13,29 +13,31 @@ function App() {
   const [selectedFace, setSelectedFace] = useState({});
   const [selectedMask, setSelectedMask] = useState({});
   const [modelsUp, setModelsUp] = useState(false);
+  const [masking, setMasking] = useState(false);
 
   useEffect(() => {
     loadModels()
       .then(() => {
+        // eslint-disable-next-line no-console
+        console.log('Models up');
         setModelsUp(true);
-        console.log('Models are up');
       })
-      .catch(error => {
-        console.log('error with models', error);
+      .catch(() => {
         setModelsUp('false');
       });
   }, []);
 
   useEffect(() => {
     if (modelsUp && selectedMask.imageUrl && selectedFace.imageUrl) {
-      console.log('time to mask', { selectedMask, selectedFace });
+      setMasking(true);
       const imageContainer = document.querySelector(`.${styles.imageWrapper}`);
       const originalImage = document.querySelector(`.${styles.previewImage}`);
-      setTimeout(() => {
-        maskify(selectedMask.imageUrl, imageContainer, originalImage);
+      setTimeout(async () => {
+        await maskify(selectedMask.imageUrl, imageContainer, originalImage);
+        setMasking(false);
       }, 200);
     }
-  }, [selectedFace, selectedMask]);
+  }, [selectedFace, selectedMask, modelsUp]);
 
   const handleDelete = () => {
     const elem = document.querySelector('#mask-overlay');
@@ -44,6 +46,7 @@ function App() {
   };
 
   const handleSelect = (image, method) => {
+    if (image.key === selectedFace.key || image.key === selectedMask.key) return;
     const elem = document.querySelector('#mask-overlay');
     if (elem) elem.parentNode.removeChild(elem);
     method(image);
@@ -87,6 +90,11 @@ function App() {
               </span>
             </label>
           </div>
+          {masking && (
+            <div className={styles.loaderContainer}>
+              <div className={styles.loader} />
+            </div>
+          )}
         </div>
 
         <ImageList
