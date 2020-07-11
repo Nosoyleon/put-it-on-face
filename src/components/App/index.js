@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import ImageList from 'components/ImageList';
+
+import { loadModels, maskify } from 'utils/maskify';
 
 import unselected from 'assets/images/default/user.png';
 import { DEFAULT_FACES, DEFAULT_MAKS } from './constants';
@@ -10,6 +12,42 @@ import styles from './styles.module.scss';
 function App() {
   const [selectedFace, setSelectedFace] = useState({});
   const [selectedMask, setSelectedMask] = useState({});
+  const [modelsUp, setModelsUp] = useState(false);
+
+  useEffect(() => {
+    loadModels()
+      .then(() => {
+        setModelsUp(true);
+        console.log('Models are up');
+      })
+      .catch(error => {
+        console.log('error with models', error);
+        setModelsUp('false');
+      });
+  }, []);
+
+  useEffect(() => {
+    if (modelsUp && selectedMask.imageUrl && selectedFace.imageUrl) {
+      console.log('time to mask', { selectedMask, selectedFace });
+      const imageContainer = document.querySelector(`.${styles.imageWrapper}`);
+      const originalImage = document.querySelector(`.${styles.previewImage}`);
+      setTimeout(() => {
+        maskify(selectedMask.imageUrl, imageContainer, originalImage);
+      }, 200);
+    }
+  }, [selectedFace, selectedMask]);
+
+  const handleDelete = () => {
+    const elem = document.querySelector('#mask-overlay');
+    if (elem) elem.parentNode.removeChild(elem);
+    setSelectedFace({});
+  };
+
+  const handleSelect = (image, method) => {
+    const elem = document.querySelector('#mask-overlay');
+    if (elem) elem.parentNode.removeChild(elem);
+    method(image);
+  };
 
   return (
     <div className={styles.mainWrapper}>
@@ -17,17 +55,17 @@ function App() {
       <div className={styles.appContainer}>
         <ImageList
           list={DEFAULT_FACES}
-          selectImage={face => setSelectedFace(face)}
+          selectImage={face => handleSelect(face, setSelectedFace)}
           selectedKey={selectedFace.key}
         />
         <div className={styles.previewContainer}>
-          <figure className={`image ${styles.imageWrapper}`}>
+          <figure className={styles.imageWrapper}>
             {selectedFace?.imageUrl && (
               <button
                 type="button"
                 aria-label="delete"
                 className={`delete is-large ${styles.delete}`}
-                onClick={() => setSelectedFace({})}
+                onClick={handleDelete}
               />
             )}
             <img
@@ -49,12 +87,11 @@ function App() {
               </span>
             </label>
           </div>
-          <span>{selectedMask.imageUrl}</span>
         </div>
 
         <ImageList
           list={DEFAULT_MAKS}
-          selectImage={mask => setSelectedMask(mask)}
+          selectImage={mask => handleSelect(mask, setSelectedMask)}
           selectedKey={selectedMask.key}
         />
       </div>
