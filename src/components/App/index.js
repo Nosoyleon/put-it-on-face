@@ -53,17 +53,37 @@ function App() {
     }
   }, [selectedFace, selectedMask, modelsUp]);
 
-  const handleDelete = () => {
+  const cleanOverlay = () => {
     const elem = document.querySelector('#mask-overlay');
     if (elem) elem.parentNode.removeChild(elem);
+  };
+
+  const cleanLocalFace = () => {
+    const localFace = document.querySelector('.file-input');
+    localFace.value = null;
+  };
+
+  const handleDelete = () => {
+    cleanOverlay();
+    cleanLocalFace();
     setSelectedFace({});
   };
 
   const handleSelect = (image, method) => {
     if (image.key === selectedFace.key || image.key === selectedMask.key) return;
-    const elem = document.querySelector('#mask-overlay');
-    if (elem) elem.parentNode.removeChild(elem);
+    cleanOverlay();
+    cleanLocalFace();
     method(image);
+  };
+
+  const handleFile = files => {
+    if (files.length) {
+      cleanOverlay();
+      setSelectedFace({
+        imageUrl: URL.createObjectURL(files[0]),
+        key: 'local-file'
+      });
+    }
   };
 
   return (
@@ -100,7 +120,12 @@ function App() {
           <div className="file is-primary mt-5 is-large is-centered">
             {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label className="file-label">
-              <input className="file-input" type="file" name="photo" />
+              <input
+                className="file-input"
+                type="file"
+                name="photo"
+                onChange={e => handleFile(e.target.files)}
+              />
               <span className="file-cta">
                 <span className="file-icon">
                   <i className="fas fa-upload" />
