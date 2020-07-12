@@ -1,5 +1,6 @@
 .mainWrapper {
   display: grid;
+  grid-template-rows: repeat(3, auto);
   padding: 20px;
 }
 .appContainer {

@@ -6,6 +6,7 @@ import ImageList from 'components/ImageList';
 import { loadModels, maskify } from 'utils/maskify';
 
 import unselected from 'assets/images/default/user.png';
+import Notification from 'components/Notification';
 import { DEFAULT_FACES, DEFAULT_MAKS } from './constants';
 import styles from './styles.module.scss';
 
@@ -14,6 +15,7 @@ function App() {
   const [selectedMask, setSelectedMask] = useState({});
   const [modelsUp, setModelsUp] = useState(false);
   const [masking, setMasking] = useState(false);
+  const [notification, setNotification] = useState({});
 
   useEffect(() => {
     loadModels()
@@ -33,7 +35,19 @@ function App() {
       const imageContainer = document.querySelector(`.${styles.imageWrapper}`);
       const originalImage = document.querySelector(`.${styles.previewImage}`);
       setTimeout(async () => {
-        await maskify(selectedMask.imageUrl, imageContainer, originalImage);
+        const masked = await maskify(
+          selectedMask.imageUrl,
+          imageContainer,
+          originalImage
+        );
+        if (masked === 'no-face')
+          setNotification({
+            message: 'No se detectó un rostro',
+            className: 'is-danger'
+          });
+        if (masked === 'masked') {
+          setNotification({});
+        }
         setMasking(false);
       }, 200);
     }
@@ -54,7 +68,12 @@ function App() {
 
   return (
     <div className={styles.mainWrapper}>
-      <h1 className="title is-1 has-text-centered mb-6">Póntelos!</h1>
+      <h1 className="title is-1 has-text-centered">Póntelos!</h1>
+      <Notification
+        message={notification.message}
+        className={notification.className}
+        onDelete={() => setNotification({})}
+      />
       <div className={styles.appContainer}>
         <ImageList
           list={DEFAULT_FACES}

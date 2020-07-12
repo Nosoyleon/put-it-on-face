@@ -1,0 +1,27 @@
+.container {
+  height: 0;
+  display: grid;
+  justify-items: center;
+  align-items: center;
+  transition: height 300ms ease-in-out;
+}
+
+.showContainer {
+  height: 40px;
+}
+
+.notification {
+  overflow: hidden;
+  transition: transform 400ms ease-in-out;
+}
+
+.newMessage {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  transform: translateY(0);
+}
+
+.hidden {
+  padding: 0;
+  transform: translateY(-500px);
+}
