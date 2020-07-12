@@ -67,6 +67,7 @@ function App() {
     cleanOverlay();
     cleanLocalFace();
     setSelectedFace({});
+    setNotification({});
   };
 
   const handleSelect = (image, method) => {
